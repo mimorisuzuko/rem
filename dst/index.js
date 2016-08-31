@@ -1,121 +1,44 @@
 /// <reference path="../typings/index.d.ts" />
 
-const _ = require('lodash');
+const nodeopen = require('open');
+const copy = require('copy-to-clipboard');
+const {Rem, _} = require('./rem.js');
 
-class Ballon {
-	/**
-	 * @param {Rem} rem
-	 */
-	constructor(rem) {
-		const element = document.createElement('div');
-		element.classList.add('ballon');
-		element.innerText = 'はい、スバルくんのレムです。';
-		_.forEach([
-			{ jp: 'わなわな', status: Rem.STATUS.WNWN },
-			{ jp: 'もじもじ', status: Rem.STATUS.MJMJ }
-		], (data, i) => {
-			const a = document.createElement('a');
-			a.href = '#';
-			a.innerText = data.jp;
-			a.dataset.status = data.status;
-			a.addEventListener('click', this.choice.bind(this));
-			element.appendChild(a);
-		});
-		rem.element.appendChild(element);
-
-		this.rem = rem;
-		this.element = element;
-
-		this.show(false);
-	}
-
-	/**
-	 * @param {Boolean} bool
-	 */
-	show(bool = true) {
-		this.element.style.display = bool ? '' : 'none';
-	}
-
-	/**
-	 * @returns {Boolean}
-	 */
-	isShwon() {
-		return this.element.style.display !== 'none';
-	}
-
-	choice() {
-		this.rem.status = parseInt(event.target.dataset.status, 10);
-		this.rem.index = 0;
-		[this.rem.wnwnField, this.rem.mjmjField].forEach((a, i) => a.style.display = this.rem.status === i ? '' : 'none');
-		this.show(false);
-	}
-}
-
-class Rem {
-	constructor() {
-		const element = document.createElement('div');
-		element.classList.add('rmt-field');
-		element.addEventListener('click', this.click.bind(this));
-		document.body.appendChild(element);
-
-		const wnwnField = document.createElement('div');
-		wnwnField.classList.add('wnwn-field');
-		const mjmjField = document.createElement('div');
-		mjmjField.classList.add('mjmj-field');
-		_.forEach([wnwnField, mjmjField], (a) => element.appendChild(a));
-
-		this.element = element;
-		this.wnwnField = wnwnField;
-		this.mjmjField = mjmjField;
-		this.ballon = new Ballon(this);
-		this.interval = 1000 / 15;
-		this.index = 0;
-		this.data = [
-			{
-				imgs: _.map(Array(13), (a, i) => {
-					const img = document.createElement('img');
-					img.src = `../images/wnwn/${`0${i}`.slice(-2)}.png`;
-					img.style.width = '100%';
-					img.style.display = 'none';
-					wnwnField.appendChild(img);
-					return img;
-				})
-			},
-			{
-				imgs: _.map(Array(9), (a, i) => {
-					const img = document.createElement('img');
-					img.src = `../images/mjmj/${`0${i}`.slice(-2)}.png`;
-					img.style.width = '100%';
-					img.style.display = 'none';
-					mjmjField.appendChild(img);
-					return img;
-				})
+const rem = new Rem({
+	google: {
+		description: 'Search Google for "${query}"',
+		f: (args) => {
+			const q = _.join(_.slice(args._, 1), ' ');
+			if (args.images) {
+				nodeopen(`https://www.google.com/search?q=${q}&tbm=isch`);
+			} else {
+				nodeopen(`https://www.google.co.jp/search?q=${q}`);
 			}
-		];
-		this.status = Rem.STATUS.WNWN;
-
-		this.draw();
+			rem.hide();
+		}
+	},
+	lower: {
+		description: 'Convert "${query}" to lower case',
+		f: (args) => {
+			const q = _.join(_.slice(args._, 1), ' ');
+			copy(_.toLower(q));
+			rem.hide();
+		}
+	},
+	camel: {
+		description: 'Convert "${query}" to camel case',
+		f: (args) => {
+			const q = _.join(_.slice(args._, 1), ' ');
+			copy(_.camelCase(q));
+			rem.hide();
+		}
+	},
+	unhex: {
+		description: 'Convert hexadecimal number',
+		f: (args) => {
+			const q = _.join(_.slice(args._, 1), ' ');
+			copy(_.parseInt(q, 16));
+			rem.hide();
+		}
 	}
-
-	draw() {
-		const remu = this.data[this.status];
-		_.forEach(remu.imgs, (a, i) => a.style.display = i === this.index ? 'block' : 'none');
-		this.index += 1;
-		if (this.index === remu.imgs.length - 1) { this.index = 0; }
-		setTimeout(this.draw.bind(this), this.interval);
-	}
-
-	click() {
-		if (this.ballon.element.contains(event.target)) { return; }
-		this.ballon.show(!this.ballon.isShwon());
-	}
-
-	static get STATUS() {
-		return {
-			WNWN: 0,
-			MJMJ: 1
-		};
-	}
-}
-
-const rem = new Rem();
+});

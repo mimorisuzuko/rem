@@ -1,29 +1,67 @@
-html, body {
+html,
+body {
   margin: 0;
   font-family: sans-serif; }
 
+@keyframes wnwn {
+  100% {
+    background-position-y: 7161px; } }
+
+@keyframes mjmj {
+  100% {
+    background-position-y: 5859px; } }
+
+.rmt {
+  width: 753px;
+  height: 651px; }
+  .rmt.wnwn {
+    background-image: url("../images/wnwn.png");
+    animation: wnwn 0.73333s steps(11) infinite; }
+  .rmt.mjmj {
+    background-image: url("../images/mjmj.png");
+    animation: mjmj 0.6s steps(9) infinite; }
+
 .rmt-field {
+  font-family: Menlo, Monaco, 'Courier New', monospace;
   position: relative; }
   .rmt-field img {
     display: block; }
   .rmt-field .ballon {
-    color: white;
     position: absolute;
-    border-radius: 4px;
-    border: 4px solid #8ebcf7;
-    background-color: rgba(142, 188, 247, 0.7);
-    padding: 5px 10px;
-    box-sizing: border-box;
-    text-align: center;
-    font-size: 1.7rem;
-    left: 3%;
     bottom: 3%;
-    width: 94%; }
-    .rmt-field .ballon a {
-      color: inherit;
+    left: 5%;
+    width: 90%;
+    border: 4px solid #8ebcf7;
+    box-sizing: border-box;
+    border-radius: 4px; }
+    .rmt-field .ballon * {
+      color: white; }
+    .rmt-field .ballon .ballon-choices-field {
       background-color: #8ebcf7;
-      text-decoration: none;
-      padding: 5px 10px;
-      border-radius: 4px; }
-      .rmt-field .ballon a:not(:last-child) {
-        margin-right: 5px; }
+      padding: 5px 10px; }
+      .rmt-field .ballon .ballon-choices-field .ballon-choices {
+        padding-bottom: 3px;
+        font-size: 1.2rem; }
+        .rmt-field .ballon .ballon-choices-field .ballon-choices .ballon-choice {
+          display: inline-block; }
+          .rmt-field .ballon .ballon-choices-field .ballon-choices .ballon-choice:not(:last-child) {
+            margin-right: 6px; }
+          .rmt-field .ballon .ballon-choices-field .ballon-choices .ballon-choice:not(:first-child) {
+            opacity: 0.5;
+            font-size: 1rem; }
+      .rmt-field .ballon .ballon-choices-field .ballon-description {
+        font-size: 0.8rem; }
+    .rmt-field .ballon .highlight {
+      text-decoration: underline; }
+    .rmt-field .ballon .ballon-input-field {
+      background-color: rgba(12, 83, 173, 0.5);
+      padding: 5px 10px; }
+    .rmt-field .ballon input[type='text'] {
+      display: block;
+      outline: none;
+      border: none;
+      font-size: 1.5rem;
+      padding: 0;
+      width: 100%;
+      box-sizing: border-box;
+      background: transparent; }

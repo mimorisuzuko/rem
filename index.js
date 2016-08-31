@@ -1,7 +1,7 @@
 /// <reference path="typings/index.d.ts" />
 
 const electron = require('electron');
-const {app, BrowserWindow} = electron;
+const {app, BrowserWindow, globalShortcut, ipcMain} = electron;
 
 let mainWindow = null;
 
@@ -19,22 +19,33 @@ const createWindow = () => {
 		resizable: false,
 		x,
 		y,
-		'always-on-top': true
+		alwaysOnTop: true
 	});
+	mainWindow.setIgnoreMouseEvents(true);
 	mainWindow.loadURL(`file://${__dirname}/dst/index.html`);
-	mainWindow.webContents.openDevTools();
-
-	mainWindow.on('closed', () => {
-		mainWindow = null;
-	});
+	mainWindow.on('closed', () => mainWindow = null);
 };
 
-app.on('ready', createWindow);
-
-app.on('window-all-closed', () => {
-    app.quit();
+app.on('ready', () => {
+	globalShortcut.register('Control+R', () => {
+		if (mainWindow) {
+			mainWindow[mainWindow.isVisible() ? 'hide' : 'show']();
+		} else {
+			createWindow();
+		}
+	});
+	createWindow();
 });
 
-app.on('activate', () => {
-	if (mainWindow === null) { createWindow(); }
+app.on('window-all-closed', () => {
+	if (process.platform !== 'darwin') { app.quit(); }
+});
+
+app.on('browser-window-blur', () => {
+	mainWindow.hide();
+});
+
+ipcMain.on('hide', (event, mes) => {
+	mainWindow.hide();
+	event.returnValue = null;
 });
