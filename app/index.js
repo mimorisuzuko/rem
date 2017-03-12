@@ -3,6 +3,8 @@ const { app, globalShortcut, ipcMain } = electron;
 const Single = require('./single-window');
 const single = new Single();
 
+app.disableHardwareAcceleration();
+
 app.on('ready', () => {
 	const { size: { width: screenWidth, height: screenHeight } } = electron.screen.getPrimaryDisplay();
 	const width = 753;
