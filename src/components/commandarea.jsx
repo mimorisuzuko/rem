@@ -68,7 +68,7 @@ class Input extends Component {
 				onChangeRemMode(name);
 				onChange('');
 			} else {
-				command.f();
+				ipcRenderer.send(`__${name}__`);
 				onChange('');
 				ReactDOM.findDOMNode(this).blur();
 			}
@@ -86,20 +86,31 @@ class Commandarea extends Component {
 	constructor(props) {
 		super(props);
 
-		this.keys = _.keys(defaultCommands);
-		this.commands = defaultCommands;
 		this.state = {
-			value: ''
+			value: '',
+			keys: _.keys(defaultCommands),
+			commands: defaultCommands
 		};
 		this.onChangeValue = this.onChangeValue.bind(this);
+		ipcRenderer.on('setup-user-commands', this.onSetupUserCommands.bind(this));
+	}
+
+	/**
+	 * @param {Electron.IpcRendererEvent} e
+	 * @param {Object} args
+	 */
+	onSetupUserCommands(e, args) {
+		const { state: { commands: _commands } } = this;
+		const commands = _.assign({}, _commands, args);
+
+		this.setState({ commands, keys: _.keys(commands) });
 	}
 
 	render() {
 		const delta = 10;
 		const {
-			state: { value },
-			props: { onChangeRemMode },
-			keys: _keys, commands: _commands
+			state: { value, keys: _keys, commands: _commands },
+			props: { onChangeRemMode }
 		} = this;
 		const { length } = value;
 		const commands = [];

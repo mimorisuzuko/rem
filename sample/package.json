@@ -1,0 +1,16 @@
+{
+  "name": "rem-sample",
+  "version": "0.0.1",
+  "description": "Sample Rem App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "devstart": "electron ."
+  },
+  "keywords": [],
+  "author": "Hiroki Usuba <hrky0206@gmail.com> (http://mimorisuzuko.github.io/)",
+  "license": "MIT",
+  "dependencies": {
+    "open": "^0.0.5"
+  }
+}
