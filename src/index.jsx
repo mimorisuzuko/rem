@@ -1,6 +1,7 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const { Rem } = require('./components/rem');
+const { Commandarea } = require('./components/commandarea');
 const { Component } = React;
 
 class App extends Component {
@@ -10,8 +11,11 @@ class App extends Component {
 
 	render() {
 		return (
-			<div>
+			<div style={{
+				position: 'relative'
+			}}>
 				<Rem mode='mjmj' />
+				<Commandarea />
 			</div>
 		);
 	}

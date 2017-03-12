@@ -9,6 +9,17 @@ $rem: (
 $rem-width: 753px;
 $rem-height: 651px;
 
+html,
+body,
+main {
+	width: $rem-width;
+	height: $rem-height;
+}
+
+body {
+	margin: 0;
+}
+
 @each $k, $v in $rem {
 	$l: map-get($v, length);
 
