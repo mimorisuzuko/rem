@@ -42,7 +42,10 @@ class Input extends Component {
 				width: '100%',
 				boxSizing: 'border-box',
 				fontSize: 24,
-				outline: 'none'
+				outline: 'none',
+				border: 'none',
+				backgroundColor: 'rgba(0, 0, 0, 0.1)',
+				padding: '2px 4px'
 			}} />
 		);
 	}
@@ -111,7 +114,7 @@ class Commandarea extends Component {
 	}
 
 	render() {
-		const delta = 10;
+		const delta = 15;
 		const {
 			state: { value, keys: _keys, commands: _commands },
 			props: { onChangeRemMode }
@@ -163,15 +166,15 @@ class Commandarea extends Component {
 				position: 'absolute',
 				bottom: delta,
 				left: delta,
-				backgroundColor: 'rgb(30, 136, 229)',
 				boxSizing: 'border-box',
+				backgroundColor: 'white',
 				borderRadius: 4,
+				boxShadow: '0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2)',
 				width: `calc(100% - ${delta * 2}px)`
 			}}>
 				<div style={{
 					fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-					padding: 4,
-					color: 'white'
+					padding: 4
 				}}>
 					<div>
 						{_.map(commands, ({ text }, i) => (
@@ -186,7 +189,8 @@ class Commandarea extends Component {
 						)}
 					</div>
 					<div style={{
-						fontSize: 14
+						fontSize: 14,
+						padding: '0 4px'
 					}}>
 						{command ? _.template(command.description)({ query: command.query }) : null}
 					</div>
