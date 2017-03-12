@@ -39,10 +39,20 @@ class Rem {
 				}
 			});
 			_.forEach(_.keys(userCommands), (a) => {
-				ipcMain.on(`__${a}__`, () => {
-					userCommands[a].f();
-					console.log('executed');
+				const { f, query } = userCommands[a];
+
+				ipcMain.on(`__${a}__`, (e, { args, query }) => {
+					f(args, query);
 				});
+
+				if (query) {
+					ipcMain.on(`__${a}-query__`, (e, args) => {
+						e.returnValue = query(args);
+					});
+					userCommands[a].query = true;
+				} else {
+					userCommands[a].query = false;
+				}
 			});
 			single.create();
 			single.window.webContents.once('did-finish-load', () => single.send('setup-user-commands', userCommands));

@@ -1,8 +1,11 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
+const minimist = require('minimist');
+const _ = require('lodash');
 const { ipcRenderer } = require('electron');
 const { Component } = React;
-const _ = require('lodash');
+
+_.templateSettings.interpolate = /\${([\s\S]+?)}/g;
 
 const defaultCommands = {
 	mjmj: {
@@ -57,23 +60,24 @@ class Input extends Component {
 	 * @param {KeyboardEvent} e
 	 */
 	onKeyDown(e) {
-		const { props: { commands: [command], onChange, onChangeRemMode } } = this;
-		const { keyCode, currentTarget: { value } } = e;
+		const { props: { commands: [command], args, onChange, onChangeRemMode } } = this;
+		const { keyCode } = e;
 
 		if (keyCode !== 13 || !command) { return; }
-		const { name } = command;
+		const { name, query } = command;
+		const { _: [head] } = args;
 
-		if (name === value) {
-			if (name === 'mjmj' || name === 'wnwn') {
-				onChangeRemMode(name);
+		if (name === head) {
+			if (head === 'mjmj' || head === 'wnwn') {
+				onChangeRemMode(head);
 				onChange('');
 			} else {
-				ipcRenderer.send(`__${name}__`);
+				ipcRenderer.send(`__${head}__`, { args, query });
 				onChange('');
 				ReactDOM.findDOMNode(this).blur();
 			}
 		} else {
-			onChange(name);
+			onChange(`${name} `);
 		}
 	}
 
@@ -112,13 +116,16 @@ class Commandarea extends Component {
 			state: { value, keys: _keys, commands: _commands },
 			props: { onChangeRemMode }
 		} = this;
-		const { length } = value;
+		const values = _.split(value, ' ');
+		const args = minimist(values);
+		const [head] = values;
+		const { length } = head;
 		const commands = [];
 
 		_.forEach(_keys, (key) => {
 			let i = 0;
 			const element = [];
-			const matchedAll = _.every(value, (v) => {
+			const matchedAll = _.every(head, (v) => {
 				let matched = false;
 
 				while (!matched && i < length + 1) {
@@ -138,16 +145,18 @@ class Commandarea extends Component {
 			});
 
 			if (matchedAll) {
-				const { description, f } = _commands[key];
+				const { description, query } = _commands[key];
 
 				commands.push({
 					text: _.concat(element, key.substring(element.length)),
 					name: key,
 					description,
-					f
+					query: query ? ipcRenderer.sendSync(`__${key}-query__`, args) : null
 				});
 			}
 		});
+
+		const [command] = commands;
 
 		return (
 			<div style={{
@@ -179,13 +188,13 @@ class Commandarea extends Component {
 					<div style={{
 						fontSize: 14
 					}}>
-						{commands.length === 0 ? null : commands[0].description}
+						{command ? _.template(command.description)({ query: command.query }) : null}
 					</div>
 				</div>
 				<div style={{
 					padding: 4
 				}}>
-					<Input value={value} onChange={this.onChangeValue} commands={commands} onChangeRemMode={onChangeRemMode} />
+					<Input value={value} onChange={this.onChangeValue} commands={commands} args={args} onChangeRemMode={onChangeRemMode} />
 				</div>
 			</div>
 		);
