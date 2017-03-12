@@ -1,102 +1,27 @@
-$rem: rgb(142, 188, 247);
-
-$lengths: (
-	wnwn: 11,
-	mjmj: 9
+$rem: (
+	mjmj: (
+		length: 9
+	),
+	wnwn: (
+		length: 11
+	)
 );
+$rem-width: 753px;
+$rem-height: 651px;
 
-html,
-body {
-	margin: 0;
-	font-family: sans-serif;
-}
+@each $k, $v in $rem {
+	$l: map-get($v, length);
 
-@each $k, $v in $lengths {
 	@keyframes #{$k} {
 		100% {
-			background-position-y: 651px * $v;
+			background-position-y: $rem-height * $l;
 		}
 	}
-}
 
-.rmt {
-	width: 753px;
-	height: 651px;
-
-	@each $k, $v in $lengths {
-		&.#{$k} {
-			background-image: url('../images/#{$k}.png');
-			animation: $k #{1 / 15 * $v}s steps($v) infinite;
-		}
-	}
-}
-
-.rmt-field {
-	font-family: Menlo, Monaco, 'Courier New', monospace;
-	position: relative;
-
-	img {
-		display: block;
-	}
-
-	.ballon {
-		position: absolute;
-		bottom: 3%;
-		left: 5%;
-		width: 90%;
-		border: 4px solid $rem;
-		box-sizing: border-box;
-		border-radius: 4px;
-
-		* {
-			color: rgb(255, 255, 255);
-		}
-
-		.ballon-choices-field {
-			background-color: $rem;
-			padding: 5px 10px;
-
-			.ballon-choices {
-				padding-bottom: 3px;
-				font-size: 1.2rem;
-
-				.ballon-choice {
-					display: inline-block;
-
-					&:not(:last-child) {
-						margin-right: 6px;
-					}
-
-					&:not(:first-child) {
-						opacity: 0.5;
-						font-size: 1rem;
-					}
-				}
-			}
-
-			.ballon-description {
-				font-size: 0.8rem;
-			}
-		}
-
-		.highlight {
-			text-decoration: underline;
-		}
-
-		.ballon-input-field {
-			background-color: rgba(darken($rem, 40), 0.5);
-			padding: 5px 10px;
-		}
-
-		input[type='text'] {
-			display: block;
-			outline: none;
-			border: none;
-			font-size: 1.5rem;
-			padding: 0;
-			width: 100%;
-			box-sizing: border-box;
-			background: transparent;
-		}
+	.#{$k} {
+		background-image: url('../../images/#{$k}.png');
+		width: $rem-width;
+		height: $rem-height;
+		animation: $k #{1 / 15 * $l}s steps($l) infinite;
 	}
 }
