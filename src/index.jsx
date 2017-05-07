@@ -42,7 +42,7 @@ class App extends Component {
 		super(props);
 
 		this.config = _.toPairs(ipcRenderer.sendSync('setup'));
-		this.state = { value: 'gle' };
+		this.state = { value: '' };
 		this.parsed = {};
 		this.candidates = [];
 		this.onBlur = this.onBlur.bind(this);
@@ -88,7 +88,7 @@ class App extends Component {
 
 			_.forEach(key, (k) => {
 				let matched = false;
-				
+
 				for (let j = i; j < length; j += 1) {
 					if (k === command.charAt(j)) {
 						matched = true;

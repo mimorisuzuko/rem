@@ -1,6 +1,7 @@
 const libpath = require('path');
 const electron = require('electron');
-const config = require('./rem.config.sample');
+const fs = require('fs');
+const config = fs.existsSync(libpath.join(__dirname, 'rem.config.js')) ? require('./rem.config') : {};
 const { app, BrowserWindow, globalShortcut, ipcMain } = electron;
 
 /** @type {Electron.BrowserWindow} */
