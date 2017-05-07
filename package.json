@@ -2,7 +2,7 @@
   "name": "rem",
   "version": "0.0.1",
   "description": "",
-  "main": "app/index.js",
+  "main": "app/rem.js",
   "scripts": {
     "build:pug": "./node_modules/.bin/pug --hierarchy -o app/dst/ src/",
     "build:scss": "./node_modules/node-sass/bin/node-sass src/index.scss app/dst/index.css --output-style compressed",
