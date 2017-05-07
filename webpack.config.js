@@ -46,7 +46,7 @@ module.exports = {
 	externals: {
 		'react': 'React',
 		'react-dom': 'ReactDOM',
-		'_': 'lodash'
+		'lodash': '_'
 	},
 	node: {
 		__filename: false,

@@ -1,5 +1,6 @@
 const libpath = require('path');
 const electron = require('electron');
+const config = require('./rem.config.sample');
 const { app, BrowserWindow, globalShortcut, ipcMain } = electron;
 
 /** @type {Electron.BrowserWindow} */
@@ -37,5 +38,14 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('blur', () => {
+	browser.hide();
+});
+
+ipcMain.on('setup', (e) => {
+	e.returnValue = config;
+});
+
+ipcMain.on('exec', (e, { func, querys, options }) => {
+	config[func].exec(querys, options);
 	browser.hide();
 });
