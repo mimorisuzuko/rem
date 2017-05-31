@@ -1,4 +1,4 @@
-const webpack = require('webpack');
+const { DefinePlugin, optimize: { UglifyJsPlugin } } = require('webpack');
 const libpath = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
@@ -17,7 +17,7 @@ module.exports = {
 				exclude: /node_modules/,
 				loader: 'babel-loader',
 				query: {
-					presets: ['react', 'babili'],
+					presets: ['react', 'es2015'],
 				}
 			}
 		]
@@ -32,10 +32,16 @@ module.exports = {
 			dry: false,
 			exclude: ['index.html', 'index.css']
 		}),
-		new webpack.DefinePlugin({
+		new DefinePlugin({
 			'process.env': {
 				NODE_ENV: JSON.stringify('production')
 			}
+		}),
+		new UglifyJsPlugin({
+			compress: {
+				warnings: false
+			},
+			mangle: true
 		})
 	],
 	node: {
