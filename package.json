@@ -11,8 +11,7 @@
     "watch:pug": "npm run build:pug -- -w",
     "watch:scss": "npm run build:scss -- -w",
     "watch:js": "npm run build:js -- -w",
-    "watch": "npm-run-all --parallel watch:*",
-    "start": "electron ."
+    "watch": "npm-run-all --parallel watch:*"
   },
   "keywords": [],
   "author": "Hiroki Usuba <hrky0206@gmail.com> (http://mimorisuzuko.github.io/)",
