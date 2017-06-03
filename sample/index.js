@@ -1,5 +1,5 @@
 const open = require('open');
-const Rem = require('../');
+const Rem = require('rem');
 
 new Rem({
 	google: {
