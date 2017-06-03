@@ -1,6 +1,13 @@
 const libpath = require('path');
 const electron = require('electron');
+const pug = require('pug');
+const fs = require('fs');
 const { app, BrowserWindow, globalShortcut, ipcMain } = electron;
+
+const targetPath = libpath.join(__dirname, 'dst/index.html');
+fs.writeFileSync(targetPath, pug.compileFile(libpath.join(__dirname, '../src/index.pug'), { self: true })({
+	cwd: process.cwd()
+}));
 
 class Rem {
 
@@ -32,7 +39,7 @@ class Rem {
 			transparent: true
 		});
 
-		browser.loadURL(`file://${libpath.join(__dirname, 'dst/index.html')}`);
+		browser.loadURL(`file://${targetPath}`);
 		globalShortcut.register('Control+R', this.onToggle.bind(this));
 		this.browser = browser;
 	}

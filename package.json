@@ -4,11 +4,9 @@
   "description": "",
   "main": "app/rem.js",
   "scripts": {
-    "build:pug": "./node_modules/.bin/pug --hierarchy -o app/dst/ src/",
     "build:scss": "./node_modules/node-sass/bin/node-sass src/index.scss app/dst/index.css --output-style compressed",
     "build:js": "./node_modules/.bin/webpack",
     "build": "npm-run-all build:*",
-    "watch:pug": "npm run build:pug -- -w",
     "watch:scss": "npm run build:scss -- -w",
     "watch:js": "npm run build:js -- -w",
     "watch": "npm-run-all --parallel watch:*"
@@ -29,6 +27,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
+    "pug": "^2.0.0-rc.2",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "yargs-parser": "^7.0.0"
