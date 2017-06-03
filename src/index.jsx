@@ -1,9 +1,9 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const _ = require('lodash');
-const minimist = require('minimist');
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, remote } = require('electron');
 const { Component } = React;
+const yargsParser = remote.require('yargs-parser');
 
 class Textarea extends Component {
 	constructor(props) {
@@ -50,36 +50,14 @@ class App extends Component {
 		this.onKeyDown = this.onKeyDown.bind(this);
 	}
 
-	/**
-	 * @param {string} value
-	 */
-	parse(value) {
-		const i = _.get(value.match(/\s/), ['index'], value.length);
-		let splited = [value.substring(0, i)];
-		const tail = value.substring(i);
-		const matched = tail.match(/[^"\s]+|"(?:\\"|[^"])+"/g);
-
-		if (matched) {
-			splited = _.concat(splited, matched);
-		} else if (tail !== '') {
-			splited.push(tail);
-		}
-
-		return minimist(_.map(splited, (s) => {
-			const { length } = s;
-
-			return s.substring(s.charAt(0) === '"' ? 1 : 0, s.charAt(length - 1) === '"' ? length - 1 : length);
-		}));
-	}
-
 	render() {
 		const {
 			config,
 			state: { value }
 		} = this;
-		const parsed = this.parse(value);
+		const parsed = yargsParser(_.trim(value));
 		const { _: [command, ...querys] } = parsed;
-		const { length } = command;
+		const { length } = command || '';
 		const candidates = [];
 
 		_.forEach(config, ([key, { description }]) => {
@@ -171,11 +149,18 @@ class App extends Component {
 		if (!selected) { return; }
 		const { text } = selected;
 		if (text === command) {
-			delete parsed._;
+			const options = {};
+
+			_.forEach(_.toPairs(parsed), ([k, v]) => {
+				if (k === '_') { return; }
+
+				options[k] = v;
+			});
+
 			ipcRenderer.send('exec', {
 				func: text,
 				querys: querys,
-				options: parsed
+				options
 			});
 		} else {
 			const i = _.get(value.match(/\s/), ['index'], value.length);

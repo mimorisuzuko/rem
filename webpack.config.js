@@ -44,6 +44,11 @@ module.exports = {
 			mangle: true
 		})
 	],
+	externals: {
+		'react': 'React',
+		'react-dom': 'ReactDOM',
+		'lodash': '_'
+	},
 	node: {
 		__filename: false,
 		__dirname: false
