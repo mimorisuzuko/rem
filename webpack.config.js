@@ -1,6 +1,7 @@
-const webpack = require('webpack');
+const { DefinePlugin, optimize: { UglifyJsPlugin } } = require('webpack');
 const libpath = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+
 const dst = 'app/dst';
 
 module.exports = {
@@ -31,12 +32,12 @@ module.exports = {
 			dry: false,
 			exclude: ['index.html', 'index.css']
 		}),
-		new webpack.DefinePlugin({
+		new DefinePlugin({
 			'process.env': {
 				NODE_ENV: JSON.stringify('production')
 			}
 		}),
-		new webpack.optimize.UglifyJsPlugin({
+		new UglifyJsPlugin({
 			compress: {
 				warnings: false
 			},
@@ -46,7 +47,7 @@ module.exports = {
 	externals: {
 		'react': 'React',
 		'react-dom': 'ReactDOM',
-		'_': 'lodash'
+		'lodash': '_'
 	},
 	node: {
 		__filename: false,

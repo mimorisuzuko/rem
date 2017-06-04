@@ -12,13 +12,23 @@ $rem-height: 651px;
 html,
 body,
 main {
-	width: $rem-width;
-	height: $rem-height;
-	font-family: sans-serif;
+	width: 100%;
+	height: 100%;
 }
 
 body {
 	margin: 0;
+
+	* {
+		font-family: "Helvetica Neue", Helvetica, Arial, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+	}
+}
+
+main {
+	> div {
+		width: 100%;
+		height: 100%;
+	}
 }
 
 @each $k, $v in $rem {
