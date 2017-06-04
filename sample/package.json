@@ -10,6 +10,7 @@
   "author": "Hiroki Usuba <hrky0206@gmail.com> (http://mimorisuzuko.github.io/)",
   "license": "MIT",
   "dependencies": {
-    "open": "^0.0.5"
+    "open": "^0.0.5",
+    "rem": "git+https://github.com/mimorisuzuko/rem#develop"
   }
 }

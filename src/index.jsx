@@ -24,6 +24,8 @@ class Textarea extends Component {
 				display: 'block',
 				boxSizing: 'border-box',
 				width: '100%',
+				height: 40,
+				lineHeight: '40px',
 				fontSize: '2rem',
 				outline: 'none',
 				border: 'none',
@@ -119,7 +121,11 @@ class App extends Component {
 						padding: '6px 12px'
 					}}>
 						{candidatesJSX}
-						{candidates.length > 0 ? <div>{_.template(candidates[0].description)({ querys })}</div> : null}
+						{candidates.length > 0 ? (
+							<div style={{ height: 24, lineHeight: '24px' }}>
+								{_.template(candidates[0].description)({ querys })}
+							</div>
+						) : null}
 						<Textarea onBlur={this.onBlur} onChange={this.onChange} onKeyDown={this.onKeyDown} value={value} />
 					</div>
 				</div>
