@@ -18,20 +18,29 @@ class Rem {
 	constructor(config = {}) {
 		/** @type {Electron.BrowserWindow} */
 		this.browser = null;
-		this.config = _.merge({
-			wnwn: {
-				description: 'Change the mode of Rem to wnwn',
-				exec: () => {
-					this.browser.webContents.send('mode', { mode: 'wnwn' });
+		this.config = _.fromPairs(_.map(_.toPairs(
+			_.merge({
+				wnwn: {
+					description: 'Change the mode of Rem to wnwn',
+					exec: () => {
+						this.browser.webContents.send('mode', { mode: 'wnwn' });
+					}
+				},
+				mjmj: {
+					description: 'Change the mode of Rem to mjmj',
+					exec: () => {
+						this.browser.webContents.send('mode', { mode: 'mjmj' });
+					}
 				}
-			},
-			mjmj: {
-				description: 'Change the mode of Rem to mjmj',
-				exec: () => {
-					this.browser.webContents.send('mode', { mode: 'mjmj' });
-				}
+			}, config)
+		), ([k, v]) => {
+			if (_.has(v, 'minQuerysLength')) {
+				return [k, v];
 			}
-		}, config);
+
+			v.minQuerysLength = 0;
+			return [k, v];
+		}));
 
 		app.on('ready', this.onReady.bind(this));
 		ipcMain.on('blur', this.onBlur.bind(this));

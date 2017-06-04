@@ -62,7 +62,7 @@ class App extends Component {
 		const { length } = command || '';
 		const candidates = [];
 
-		_.forEach(config, ([key, { description }]) => {
+		_.forEach(config, ([key, { description, minQuerysLength }]) => {
 			let i = 0;
 			const element = [];
 
@@ -86,7 +86,8 @@ class App extends Component {
 				candidates.push({
 					text: key,
 					description,
-					element
+					element,
+					minQuerysLength
 				});
 			}
 		});
@@ -157,8 +158,9 @@ class App extends Component {
 		const { _: [command, ...querys] } = parsed;
 		const selected = candidates[0];
 		if (!selected) { return; }
-		const { text } = selected;
-		if (text === command) {
+		const { text, minQuerysLength } = selected;
+
+		if (querys.length >= minQuerysLength) {
 			const options = {};
 
 			_.forEach(_.toPairs(parsed), ([k, v]) => {
@@ -173,7 +175,7 @@ class App extends Component {
 				options
 			});
 			this.setState({ value: '' });
-		} else {
+		} else if (text !== command) {
 			const i = _.get(value.match(/\s/), ['index'], value.length);
 
 			this.setState({
