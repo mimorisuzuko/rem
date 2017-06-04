@@ -42,18 +42,20 @@ class App extends Component {
 		super(props);
 
 		this.config = _.toPairs(ipcRenderer.sendSync('setup'));
-		this.state = { value: '' };
+		this.state = { value: '', mode: 'wnwn' };
 		this.parsed = {};
 		this.candidates = [];
 		this.onBlur = this.onBlur.bind(this);
 		this.onChange = this.onChange.bind(this);
 		this.onKeyDown = this.onKeyDown.bind(this);
+
+		ipcRenderer.on('mode', this.onMode.bind(this));
 	}
 
 	render() {
 		const {
 			config,
-			state: { value }
+			state: { value, mode }
 		} = this;
 		const parsed = yargsParser(_.trim(value));
 		const { _: [command, ...querys] } = parsed;
@@ -105,7 +107,7 @@ class App extends Component {
 
 		return (
 			<div>
-				<div className='wnwn' style={{ position: 'relative' }}>
+				<div className={mode} style={{ position: 'relative' }}>
 					<div style={{
 						position: 'absolute',
 						width: '90%',
@@ -122,6 +124,14 @@ class App extends Component {
 				</div>
 			</div>
 		);
+	}
+
+	/**
+	 * @param {Electron.IpcRendererEvent} e
+	 * @param {{mode: string}} args
+	 */
+	onMode(e, args) {
+		this.setState({ mode: args.mode });
 	}
 
 	onBlur() {
@@ -162,6 +172,7 @@ class App extends Component {
 				querys: querys,
 				options
 			});
+			this.setState({ value: '' });
 		} else {
 			const i = _.get(value.match(/\s/), ['index'], value.length);
 

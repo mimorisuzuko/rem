@@ -2,6 +2,7 @@ const libpath = require('path');
 const electron = require('electron');
 const pug = require('pug');
 const fs = require('fs');
+const _ = require('lodash');
 const { app, BrowserWindow, globalShortcut, ipcMain } = electron;
 
 const targetPath = libpath.join(__dirname, 'dst/index.html');
@@ -17,7 +18,20 @@ class Rem {
 	constructor(config = {}) {
 		/** @type {Electron.BrowserWindow} */
 		this.browser = null;
-		this.config = config;
+		this.config = _.merge({
+			wnwn: {
+				description: 'Change the mode of Rem to wnwn',
+				exec: () => {
+					this.browser.webContents.send('mode', { mode: 'wnwn' });
+				}
+			},
+			mjmj: {
+				description: 'Change the mode of Rem to mjmj',
+				exec: () => {
+					this.browser.webContents.send('mode', { mode: 'mjmj' });
+				}
+			}
+		}, config);
 
 		app.on('ready', this.onReady.bind(this));
 		ipcMain.on('blur', this.onBlur.bind(this));
