@@ -1,14 +1,8 @@
-const libpath = require('path');
 const electron = require('electron');
-const pug = require('pug');
-const fs = require('fs');
 const _ = require('lodash');
+const libpath = require('path');
+const { env: { NODE_ENV } } = process;
 const { app, BrowserWindow, globalShortcut, ipcMain } = electron;
-
-const targetPath = libpath.join(__dirname, 'dst/index.html');
-fs.writeFileSync(targetPath, pug.compileFile(libpath.join(__dirname, '../src/index.pug'), { self: true })({
-	cwd: process.cwd()
-}));
 
 class Rem {
 
@@ -62,7 +56,7 @@ class Rem {
 			transparent: true
 		});
 
-		browser.loadURL(`file://${targetPath}`);
+		browser.loadURL(NODE_ENV === 'development' ? 'http://localhost:3000' : `file://${libpath.join(__dirname, 'dst/index.html')}`);
 		globalShortcut.register('Control+R', this.onToggle.bind(this));
 		this.browser = browser;
 	}

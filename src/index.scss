@@ -34,14 +34,14 @@ main {
 @each $k, $v in $rem {
 	$l: map-get($v, length);
 
-	@keyframes #{$k} {
+	@keyframes :global(#{$k}) {
 		100% {
 			background-position-y: $rem-height * $l;
 		}
 	}
 
-	.#{$k} {
-		background-image: url('../../images/#{$k}.png');
+	:global .#{$k} {
+		background-image: url('./images/#{$k}.png');
 		width: $rem-width;
 		height: $rem-height;
 		animation: $k #{1 / 15 * $l}s steps($l) infinite;

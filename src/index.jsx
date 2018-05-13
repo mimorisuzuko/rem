@@ -1,17 +1,24 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const _ = require('lodash');
-const { ipcRenderer, remote } = require('electron');
-const { Component } = React;
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
+import _ from 'lodash';
+import { ipcRenderer, remote } from 'electron';
+import autobind from 'autobind-decorator';
+import './index.scss';
+
 const yargsParser = remote.require('yargs-parser');
 
 class Textarea extends Component {
 	constructor(props) {
 		super(props);
 
-		ipcRenderer.on('focus', this.onFocus.bind(this));
+		ipcRenderer.on('focus', this.onFocus);
 	}
 
+	componentDidMount() {
+		ReactDOM.findDOMNode(this).focus();
+	}
+
+	@autobind
 	onFocus() {
 		ReactDOM.findDOMNode(this).focus();
 	}
@@ -30,12 +37,9 @@ class Textarea extends Component {
 				outline: 'none',
 				border: 'none',
 				backgroundColor: 'transparent'
-			}} />
+			}}
+			/>
 		);
-	}
-
-	componentDidMount() {
-		ReactDOM.findDOMNode(this).focus();
 	}
 }
 
@@ -47,11 +51,69 @@ class App extends Component {
 		this.state = { value: '', mode: 'wnwn' };
 		this.parsed = {};
 		this.candidates = [];
-		this.onBlur = this.onBlur.bind(this);
-		this.onChange = this.onChange.bind(this);
-		this.onKeyDown = this.onKeyDown.bind(this);
 
-		ipcRenderer.on('mode', this.onMode.bind(this));
+		ipcRenderer.on('mode', this.onMode);
+	}
+
+	/**
+	 * @param {Electron.IpcRendererEvent} e
+	 * @param {{mode: string}} args
+	 */
+	@autobind
+	onMode(e, args) {
+		this.setState({ mode: args.mode });
+	}
+
+	@autobind
+	onBlur() {
+		ipcRenderer.send('blur');
+	}
+
+	/**
+	 * @param {Event} e
+	 */
+	@autobind
+	onChange(e) {
+		this.setState({ value: e.currentTarget.value });
+	}
+
+	/**
+	 * @param {KeyboardEvent} e
+	 */
+	@autobind
+	onKeyDown(e) {
+		if (e.keyCode !== 13) { return; }
+		const {
+			candidates, parsed,
+			state: { value }
+		} = this;
+		const { _: [command, ...querys] } = parsed;
+		const selected = candidates[0];
+		if (!selected) { return; }
+		const { text, minQuerysLength } = selected;
+
+		if (querys.length >= minQuerysLength) {
+			const options = {};
+
+			_.forEach(_.toPairs(parsed), ([k, v]) => {
+				if (k === '_') { return; }
+
+				options[k] = v;
+			});
+
+			ipcRenderer.send('exec', {
+				func: text,
+				querys: querys,
+				options
+			});
+			this.setState({ value: '' });
+		} else if (text !== command) {
+			const i = _.get(value.match(/\s/), ['index'], value.length);
+
+			this.setState({
+				value: `${text} ${value.slice(i)}`
+			});
+		}
 	}
 
 	render() {
@@ -119,7 +181,8 @@ class App extends Component {
 						backgroundColor: 'rgb(242, 242, 242)',
 						borderRadius: 4,
 						padding: '6px 12px'
-					}}>
+					}}
+					>
 						{candidatesJSX}
 						{candidates.length > 0 ? (
 							<div style={{ height: 24, lineHeight: '24px' }}>
@@ -131,63 +194,6 @@ class App extends Component {
 				</div>
 			</div>
 		);
-	}
-
-	/**
-	 * @param {Electron.IpcRendererEvent} e
-	 * @param {{mode: string}} args
-	 */
-	onMode(e, args) {
-		this.setState({ mode: args.mode });
-	}
-
-	onBlur() {
-		ipcRenderer.send('blur');
-	}
-
-	/**
-	 * @param {Event} e
-	 */
-	onChange(e) {
-		this.setState({ value: e.currentTarget.value });
-	}
-
-	/**
-	 * @param {KeyboardEvent} e
-	 */
-	onKeyDown(e) {
-		if (e.keyCode !== 13) { return; }
-		const {
-			candidates, parsed,
-			state: { value }
-		} = this;
-		const { _: [command, ...querys] } = parsed;
-		const selected = candidates[0];
-		if (!selected) { return; }
-		const { text, minQuerysLength } = selected;
-
-		if (querys.length >= minQuerysLength) {
-			const options = {};
-
-			_.forEach(_.toPairs(parsed), ([k, v]) => {
-				if (k === '_') { return; }
-
-				options[k] = v;
-			});
-
-			ipcRenderer.send('exec', {
-				func: text,
-				querys: querys,
-				options
-			});
-			this.setState({ value: '' });
-		} else if (text !== command) {
-			const i = _.get(value.match(/\s/), ['index'], value.length);
-
-			this.setState({
-				value: `${text} ${value.slice(i)}`
-			});
-		}
 	}
 }
 
