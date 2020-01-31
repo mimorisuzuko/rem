@@ -52,6 +52,25 @@ export default class App extends Component {
         this.setState({ query: value });
     };
 
+    onKeyDown = (e) => {
+        const {
+            state: { selectedIndex, filteredCandidates }
+        } = this;
+        const { keyCode } = e;
+
+        if (keyCode === 38) {
+            this.setState({ selectedIndex: Math.max(selectedIndex - 1, 0) });
+            e.preventDefault();
+        } else if (keyCode === 40) {
+            const { length } = filteredCandidates;
+
+            this.setState({
+                selectedIndex: Math.min(selectedIndex + 1, length - 1)
+            });
+            e.preventDefault();
+        }
+    };
+
     render = () => {
         const {
             state: { rem, query, filteredCandidates, selectedIndex }
@@ -129,6 +148,7 @@ export default class App extends Component {
                     </div>
                     <input
                         onChange={this.onChange}
+                        onKeyDown={this.onKeyDown}
                         type='text'
                         value={query}
                         className={css({
