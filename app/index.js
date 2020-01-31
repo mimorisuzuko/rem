@@ -1,42 +1,60 @@
-const { app, BrowserWindow } = require('electron');
+const {
+    app,
+    BrowserWindow,
+    screen,
+    ipcMain,
+    globalShortcut
+} = require('electron');
 const libpath = require('path');
 const {
-  env: { NODE_ENV }
+    env: { NODE_ENV }
 } = process;
 const {
-  default: installExtension,
-  REACT_DEVELOPER_TOOLS
+    default: installExtension,
+    REACT_DEVELOPER_TOOLS
 } = require('electron-devtools-installer');
 
 /** @type {Electron.BrowserWindow} */
 let browserWindow = null;
 
 const create = () => {
-  const w = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-      webSecurity: false
-    }
-  });
+    const {
+        size: { width, height }
+    } = screen.getPrimaryDisplay();
+    const remWidth = 753;
+    const remHeight = 651;
 
-  w.loadURL(
-    NODE_ENV === 'development'
-      ? 'http://localhost:3000'
-      : `file://${libpath.join(__dirname, 'dst/index.html')}`
-  );
+    browserWindow = new BrowserWindow({
+        width: remWidth,
+        height: remHeight,
+        x: width - remWidth,
+        y: height - remHeight,
+        transparent: true,
+        frame: false,
+        webPreferences: {
+            nodeIntegration: true,
+            webSecurity: false
+        }
+    });
 
-  w.on('closed', () => {
-    browserWindow = null;
-  });
+    browserWindow.loadURL(
+        NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : `file://${libpath.join(__dirname, 'dst/index.html')}`
+    );
 
-  browserWindow = w;
+    browserWindow.on('closed', () => {
+        browserWindow = null;
+    });
 };
 
 app.on('ready', () => {
-  create();
-  installExtension(REACT_DEVELOPER_TOOLS).catch(console.error);
+    create();
+    installExtension(REACT_DEVELOPER_TOOLS).catch(console.error);
+
+    globalShortcut.register('Alt+Space', () => {
+        browserWindow.show();
+    });
 });
 
 app.on('window-all-closed', () => {
@@ -44,7 +62,11 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (!browserWindow) {
-    create();
-  }
+    if (!browserWindow) {
+        create();
+    }
+});
+
+ipcMain.addListener('hide', () => {
+    browserWindow.hide();
 });

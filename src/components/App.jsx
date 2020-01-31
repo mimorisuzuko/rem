@@ -1,15 +1,17 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import { css } from 'emotion';
 import yargsParser from 'yargs-parser';
 import fz from 'fz';
 import _ from 'lodash';
+import { ipcRenderer } from 'electron';
 import Rem from './Rem';
 
 export default class App extends Component {
     static getDerivedStateFromProps(props, { query, candidates }) {
+        const yargsParsedQuery = yargsParser(query);
         const {
             _: [parsed]
-        } = yargsParser(query);
+        } = yargsParsedQuery;
         const filteredCandidates = [];
 
         _.forEach(candidates, (candidate, key) => {
@@ -24,41 +26,89 @@ export default class App extends Component {
             }
         });
 
-        return { filteredCandidates };
+        return { filteredCandidates, yargsParsedQuery };
     }
 
     state = {
         rem: 'mjmj',
         query: '',
+        yargsParsedQuery: {},
         selectedIndex: 0,
         candidates: {
             mjmj: {
                 description: 'MJMJ mode.',
                 exec: () => {
-                    this.setState({ rem: 'mjmj' });
-                }
+                    this.setState({ rem: 'mjmj', query: '', selectedIndex: 0 });
+                },
+                minArgs: 0,
+                _skipReset: true
             },
             wnwn: {
                 description: 'WNWN mode.',
                 exec: () => {
-                    this.setState({ rem: 'wnwn' });
-                }
+                    this.setState({ rem: 'wnwn', query: '', selectedIndex: 0 });
+                },
+                minArgs: 0,
+                _skipReset: true
             }
         },
         filteredCandidates: []
     };
+    _$input = createRef();
+
+    componentDidMount = () => {
+        const {
+            _$input: { current: $input }
+        } = this;
+
+        $input.focus();
+        window.addEventListener('focus', () => {
+            $input.focus();
+        });
+    };
 
     onChange = ({ currentTarget: { value } }) => {
-        this.setState({ query: value });
+        this.setState({ query: value, selectedIndex: 0 });
     };
 
     onKeyDown = (e) => {
         const {
-            state: { selectedIndex, filteredCandidates }
+            state: {
+                selectedIndex,
+                filteredCandidates,
+                query,
+                yargsParsedQuery
+            },
+            _$input: { current: $input }
         } = this;
         const { keyCode } = e;
 
-        if (keyCode === 38) {
+        if (keyCode === 27) {
+            $input.blur();
+        } else if (keyCode == 13) {
+            const selected = filteredCandidates[selectedIndex];
+
+            if (selected) {
+                const { key, exec } = selected;
+                const { matched } = fz(key, query, true);
+
+                if (matched) {
+                    this.setState({ query: `${key} ` });
+                } else {
+                    const {
+                        _: [, ...args],
+                        ...options
+                    } = yargsParsedQuery;
+
+                    exec(args, options);
+                    this.setState({ query: '', selectedIndex: 0 }, () => {
+                        ipcRenderer.send('hide');
+                    });
+                }
+
+                e.preventDefault();
+            }
+        } else if (keyCode === 38) {
             this.setState({ selectedIndex: Math.max(selectedIndex - 1, 0) });
             e.preventDefault();
         } else if (keyCode === 40) {
@@ -148,6 +198,7 @@ export default class App extends Component {
                         )}
                     </div>
                     <input
+                        ref={this._$input}
                         onChange={this.onChange}
                         onKeyDown={this.onKeyDown}
                         type='text'
