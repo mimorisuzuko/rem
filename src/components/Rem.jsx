@@ -35,8 +35,6 @@ export default class Rem extends Component {
         } = this;
         const { frames, animation, background } = config[name];
 
-        console.log(background);
-
         return (
             <div
                 className={css({
