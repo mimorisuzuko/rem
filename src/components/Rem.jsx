@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { css, keyframes } from 'emotion';
-import { remote } from 'electron';
-import libpath from 'path';
+import mjmj from '../assets/mjmj.png';
+import wnwn from '../assets/wnwn.png';
 
-const { app } = remote;
 const WIDTH = 753;
 const HEIGHT = 651;
 const mjmjFrames = 9;
@@ -15,7 +14,8 @@ const config = {
             background-position-y: ${HEIGHT * mjmjFrames}px;
         }
         `,
-        frames: mjmjFrames
+        frames: mjmjFrames,
+        background: mjmj
     },
     wnwn: {
         animation: keyframes`
@@ -23,7 +23,8 @@ const config = {
             background-position-y: ${HEIGHT * wnwnFrames}px;
         }
         `,
-        frames: wnwnFrames
+        frames: wnwnFrames,
+        background: wnwn
     }
 };
 
@@ -32,17 +33,16 @@ export default class Rem extends Component {
         const {
             props: { name }
         } = this;
-        const { frames, animation } = config[name];
+        const { frames, animation, background } = config[name];
+
+        console.log(background);
 
         return (
             <div
                 className={css({
                     width: WIDTH,
                     height: HEIGHT,
-                    background: `url(file://${libpath.join(
-                        app.getAppPath(),
-                        `app/dst/assets/${name}.png`
-                    )})`,
+                    background: `url(${background})`,
                     animation: `${animation} ${(1 / 15) *
                         frames}s steps(${frames}) infinite`
                 })}

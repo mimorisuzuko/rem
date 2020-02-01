@@ -13,7 +13,7 @@ module.exports = (env, { mode }) => {
 
     const plugins = [
         new CleanWebpackPlugin({
-            cleanOnceBeforeBuildPatterns: ['!index.html', '!assets'],
+            cleanOnceBeforeBuildPatterns: ['!index.html'],
             verbose: false,
             dry: false
         }),
@@ -45,7 +45,6 @@ module.exports = (env, { mode }) => {
               ],
         output: {
             path: libpath.join(__dirname, dst),
-            publicPath: 'http://localhost:3000/',
             filename: '[name].js'
         },
         module: {
@@ -56,8 +55,11 @@ module.exports = (env, { mode }) => {
                     loader: 'babel-loader'
                 },
                 {
-                    test: /\.css$/,
-                    use: ['style-loader', 'css-loader']
+                    test: /\.png$/,
+                    loader: 'file-loader',
+                    options: {
+                        outputPath: 'assets'
+                    }
                 }
             ]
         },
